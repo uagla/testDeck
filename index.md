@@ -119,7 +119,3 @@ An screenshot of the performed [application](https://ggdrq.shinyapps.io/ProjectD
   </div>
 </div> 
 
-
---- 
-
-
