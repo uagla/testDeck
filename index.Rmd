@@ -1,26 +1,102 @@
 ---
-title       : Test deck
-subtitle    : 
-author      : 
+title       : CURB-65 Mortality prediction in Community Acquired Pneumonia
+subtitle    : A Clinical Decision Rule
+author      : Urko Aguirre
 job         : 
 framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
 highlighter : highlight.js  # {highlight.js, prettify, highlight}
 hitheme     : tomorrow      # 
-widgets     : []            # {mathjax, quiz, bootstrap}
+widgets     : [bootstrap, quiz, shiny, interactive]            # {mathjax, quiz, bootstrap}
 mode        : selfcontained # {standalone, draft}
+knit        : slidify::knit2slides
 ---
 
-## Read-And-Delete
+## Introduction 
 
-1. Edit YAML front matter
-2. Write using R Markdown
-3. Use an empty line followed by three dashes to separate slides!
+* Community-acquired pneumonia (CAP) is the leading cause of death from infectious disease in the world and is a major burden on healthcare resources. 
 
---- .class #id 
+* In the assessment and management of CAP, disease severity assessment is crucial because it guides therapeutic options (need of hospital or intensive care unit (ICU) admission, suitability of discharge to the  home, etc...).
 
-## Slide 2
+*  The routine clinical judgment is often insufficient for assessing the severity of CAP: Clinical judgment alone may underestimate its severity and may lead to variations in the rates of admission to a hospital or ICU or even in discharged patients.
 
-```{r, fig.height=5, fig.width=5}
-plot(1 : 10, 1 : 10)
+* An index which stratifies patients according to their risk mortality and features is the best tool for the management and assessment of the disease. 
+
+--- 
+
+## CURB-65: a Pneumonia Severity index. 
+
+* It is a clinical rule recommended by the British Thoracic Society for the assessment of the severity of the pneumonia. CURB-65 involves calculating a score, which places a given patient into one of 6 risk classes (0-5). The higher the score, the higher the risk mortality is. 
+
+| Variable           |  Description                    |     Condition                        |   Points  
+|--------------------|---------------------------------|--------------------------------------|--------------
+| `Age`              | Patient's age                   |    Age > 65 years                    |       1       |                    |                                 |                                      |
+| `Confusion`        | Mental status                   |    Mentally altered                  |       1       |                    |                                 |                                      |
+| `BUN`              | Blood urea nitrogen, in mmol/l  |    BUN > 7 mmol/l                    |       1       |                    |                                 |                                      |
+| `RR`               | Respiratory rate                |    RR >= 30                          |       1       |                    |                                 |                                      |
+| `SBP_DBP`          | Systolic and diastolic measure  |    Systolic <90 or Diastolic <60 mmHg|       1       |                                          
+
+The total score is the sum of the obtained points in each variable. Management can be classified as:
+
+| CURB-65            |  Management                     |   
+|--------------------|---------------------------------|
+| 0-1                | Home                            |                                           
+| 2                  | Likely to need admission        |             
+| 3-4-5              | Admission and manage as Severe  |    
+
+
+---- 
+### Example 
+Suposse that a 80 aged and no mentally altered woman goes to the Emergency Room and has been diagnosed with CAP. Physicians have performed some tests in order to determine the severity of the disease. Results indicate that: a BUN = 10 mmol/l,  RR = 45 and diastolic pressure of 50.
+```{r}
+Age<-80; Confusion<-0; BUN<-10; RR<-45; SBP_DBP = 1  # since DBP = 50 < 60.
+curb65<-ifelse(Age>65,1,0)+ifelse(Confusion==1,1,0)+ifelse(BUN>7,1,0)+ifelse(RR>=30,1,0)+ifelse(SBP_DBP==1,1,0)
+management<-c("Home","Home","Likely to need admission", "Admission and manage as Severe","Admission and manage as Severe","Admission and manage as Severe")
+decission<-c(curb65,management[curb65+1])
+decission
 ```
+
+---- 
+
+## Application
+An screenshot of the performed [application](https://ggdrq.shinyapps.io/ProjectDef/) . 
+
+```{r opts.label='shiny'}
+shinyUI(fluidPage( 
+  sidebarLayout(
+  sidebarPanel(
+    p('Symptons'),
+    sliderInput(inputId = "Age",
+                label = "1. Age of patient",
+                min = 0, max = 110, value = 60, step = 1),
+    radioButtons(inputId = "Confusion",
+                       label = "2. Confusion (Mental Test)",
+                       choices = list("No" = "N", "Yes" = "Y")),
+    numericInput(inputId = "BUN",
+                 label = "3. Blood Urea Nitrogen (mmol/l)",4,
+                 min=0),
+    numericInput(inputId = "RR",
+                 label = "4. Respiratory Rate", 20,min=0),
+    
+    radioButtons(inputId = "SBP_DBP",
+                 label = "5. Blood pressure: Systolic < 90 mmHg or Diastolic <=60 mmHg",
+                 choices = list("No" = "N", "Yes" = "Y")),    
+
+    tags$hr()
+    
+    #submitButton("Compute score")
+    ),
+  
+    mainPanel( 
+           h3("CURB-65 score:"),
+           verbatimTextOutput("val"),
+           h4("Management:"),
+           verbatimTextOutput("management")
+           
+      )
+  )
+))
+
+```
+
+--- 
 
