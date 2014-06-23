@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Test deck</title>
+  <title>CURB-65 Mortality prediction in Community Acquired Pneumonia</title>
   <meta charset="utf-8">
-  <meta name="description" content="Test deck">
-  <meta name="author" content="">
+  <meta name="description" content="CURB-65 Mortality prediction in Community Acquired Pneumonia">
+  <meta name="author" content="Urko Aguirre">
   <meta name="generator" content="slidify" />
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
@@ -13,7 +13,10 @@
     media="only screen and (max-device-width: 480px)" >
   <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
   <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
-  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="libraries/widgets/bootstrap/css/bootstrap.css"></link>
+<link rel=stylesheet href="libraries/widgets/quiz/css/demo.css"></link>
+<link rel=stylesheet href="libraries/widgets/interactive/css/aceeditor.css"></link>
+<link rel=stylesheet href="./assets/css/ribbons.css"></link>
 
   
   <!-- Grab CDN jQuery, fall back to local if offline -->
@@ -32,9 +35,9 @@
     <!-- LOGO SLIDE -->
         <slide class="title-slide segue nobackground">
   <hgroup class="auto-fadein">
-    <h1>Test deck</h1>
-    <h2></h2>
-    <p><br/></p>
+    <h1>CURB-65 Mortality prediction in Community Acquired Pneumonia</h1>
+    <h2>A Clinical Decision Rule</h2>
+    <p>Urko Aguirre<br/></p>
   </hgroup>
   <article></article>  
 </slide>
@@ -43,29 +46,183 @@
     <!-- SLIDES -->
     <slide class="" id="slide-1" style="background:;">
   <hgroup>
-    <h2>Read-And-Delete</h2>
+    <h2>Introduction</h2>
   </hgroup>
   <article data-timings="">
-    <ol>
-<li>Edit YAML front matter</li>
-<li>Write using R Markdown</li>
-<li>Use an empty line followed by three dashes to separate slides!</li>
-</ol>
+    <ul>
+<li><p>Community-acquired pneumonia (CAP) is the leading cause of death from infectious disease in the world and is a major burden on healthcare resources. </p></li>
+<li><p>In the assessment and management of CAP, disease severity assessment is crucial because it guides therapeutic options (need of hospital or intensive care unit (ICU) admission, suitability of discharge to the  home, etc...).</p></li>
+<li><p>The routine clinical judgment is often insufficient for assessing the severity of CAP: Clinical judgment alone may underestimate its severity and may lead to variations in the rates of admission to a hospital or ICU or even in discharged patients.</p></li>
+<li><p>An index which stratifies patients according to their risk mortality and features is the best tool for the management and assessment of the disease. </p></li>
+</ul>
 
   </article>
   <!-- Presenter Notes -->
 </slide>
 
-<slide class="class" id="id" style="background:;">
+<slide class="" id="slide-2" style="background:;">
   <hgroup>
-    <h2>Slide 2</h2>
+    <h2>CURB-65: a Pneumonia Severity index.</h2>
   </hgroup>
   <article data-timings="">
-    <pre><code class="r">plot(1:10, 1:10)
+    <ul>
+<li>It is a clinical rule recommended by the British Thoracic Society for the assessment of the severity of the pneumonia. CURB-65 involves calculating a score, which places a given patient into one of 6 risk classes (0-5). The higher the score, the higher the risk mortality is. </li>
+</ul>
+
+<table><thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+<th>Condition</th>
+<th>Points</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><code>Age</code></td>
+<td>Patient&#39;s age</td>
+<td>Age &gt; 65 years</td>
+<td>1</td>
+</tr>
+<tr>
+<td><code>Confusion</code></td>
+<td>Mental status</td>
+<td>Mentally altered</td>
+<td>1</td>
+</tr>
+<tr>
+<td><code>BUN</code></td>
+<td>Blood urea nitrogen, in mmol/l</td>
+<td>BUN &gt; 7 mmol/l</td>
+<td>1</td>
+</tr>
+<tr>
+<td><code>RR</code></td>
+<td>Respiratory rate</td>
+<td>RR &gt;= 30</td>
+<td>1</td>
+</tr>
+<tr>
+<td><code>SBP_DBP</code></td>
+<td>Systolic and diastolic measure</td>
+<td>Systolic &lt;90 or Diastolic &lt;60 mmHg</td>
+<td>1</td>
+</tr>
+</tbody></table>
+
+<p>The total score is the sum of the obtained points in each variable. Management can be classified as:</p>
+
+<table><thead>
+<tr>
+<th>CURB-65</th>
+<th>Management</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>0-1</td>
+<td>Home</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Likely to need admission</td>
+</tr>
+<tr>
+<td>3-4-5</td>
+<td>Admission and manage as Severe</td>
+</tr>
+</tbody></table>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-3" style="background:;">
+  <hgroup>
+    <h3>Example</h3>
+  </hgroup>
+  <article data-timings="">
+    <p>Suposse that a 80 aged and no mentally altered woman goes to the Emergency Room and has been diagnosed with CAP. Physicians have performed some tests in order to determine the severity of the disease. Results indicate that: a BUN = 10 mmol/l,  RR = 45 and diastolic pressure of 50.</p>
+
+<pre><code class="r">Age &lt;- 80
+Confusion &lt;- 0
+BUN &lt;- 10
+RR &lt;- 45
+SBP_DBP = 1  # since DBP = 50 &lt; 60.
+curb65 &lt;- ifelse(Age &gt; 65, 1, 0) + ifelse(Confusion == 1, 1, 0) + ifelse(BUN &gt; 
+    7, 1, 0) + ifelse(RR &gt;= 30, 1, 0) + ifelse(SBP_DBP == 1, 1, 0)
+management &lt;- c(&quot;Home&quot;, &quot;Home&quot;, &quot;Likely to need admission&quot;, &quot;Admission and manage as Severe&quot;, 
+    &quot;Admission and manage as Severe&quot;, &quot;Admission and manage as Severe&quot;)
+decission &lt;- c(curb65, management[curb65 + 1])
+decission
 </code></pre>
 
-<p><img src="assets/fig/unnamed-chunk-1.png" alt="plot of chunk unnamed-chunk-1"> </p>
+<pre><code>## [1] &quot;4&quot;                              &quot;Admission and manage as Severe&quot;
+</code></pre>
 
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-4" style="background:;">
+  <hgroup>
+    <h2>Application</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>An screenshot of the performed <a href="https://ggdrq.shinyapps.io/ProjectDef/">application</a> . </p>
+
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span4">
+      <form class="well">
+        <p>Symptons</p>
+        <div>
+          <label class="control-label" for="Age">1. Age of patient</label>
+          <input id="Age" type="slider" name="Age" value="60" class="jslider" data-from="0" data-to="110" data-step="1" data-skin="plastic" data-round="FALSE" data-locale="us" data-format="#,##0.#####" data-smooth="FALSE"/>
+        </div>
+        <div id="Confusion" class="control-group shiny-input-radiogroup">
+          <label class="control-label" for="Confusion">2. Confusion (Mental Test)</label>
+          <label class="radio">
+            <input type="radio" name="Confusion" id="Confusion1" value="N" checked="checked"/>
+            <span>No</span>
+          </label>
+          <label class="radio">
+            <input type="radio" name="Confusion" id="Confusion2" value="Y"/>
+            <span>Yes</span>
+          </label>
+        </div>
+        <label for="BUN">3. Blood Urea Nitrogen (mmol/l)</label>
+        <input id="BUN" type="number" value="4" min="0"/>
+        <label for="RR">4. Respiratory Rate</label>
+        <input id="RR" type="number" value="20" min="0"/>
+        <div id="SBP_DBP" class="control-group shiny-input-radiogroup">
+          <label class="control-label" for="SBP_DBP">5. Blood pressure: Systolic &lt; 90 mmHg or Diastolic &lt;=60 mmHg</label>
+          <label class="radio">
+            <input type="radio" name="SBP_DBP" id="SBP_DBP1" value="N" checked="checked"/>
+            <span>No</span>
+          </label>
+          <label class="radio">
+            <input type="radio" name="SBP_DBP" id="SBP_DBP2" value="Y"/>
+            <span>Yes</span>
+          </label>
+        </div>
+        <hr/>
+      </form>
+    </div>
+    <div class="span8">
+      <h3>CURB-65 score:</h3>
+      <pre id="val" class="shiny-text-output"></pre>
+      <h4>Management:</h4>
+      <pre id="management" class="shiny-text-output"></pre>
+    </div>
+  </div>
+</div> 
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-5" style="background:;">
+  <article data-timings="">
+    
   </article>
   <!-- Presenter Notes -->
 </slide>
@@ -76,14 +233,32 @@
     <ul>
       <li>
       <a href="#" target="_self" rel='tooltip' 
-        data-slide=1 title='Read-And-Delete'>
+        data-slide=1 title='Introduction'>
          1
       </a>
     </li>
     <li>
       <a href="#" target="_self" rel='tooltip' 
-        data-slide=2 title='Slide 2'>
+        data-slide=2 title='CURB-65: a Pneumonia Severity index.'>
          2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='Example'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='Application'>
+         4
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=5 title=''>
+         5
       </a>
     </li>
   </ul>
@@ -95,6 +270,25 @@
   <![endif]-->
 </body>
   <!-- Load Javascripts for Widgets -->
+  <script src="libraries/widgets/bootstrap/js/bootstrap.min.js"></script>
+<script src="libraries/widgets/bootstrap/js/bootbox.min.js"></script>
+<script src="libraries/widgets/quiz/js/jquery.quiz.js"></script>
+<script src="libraries/widgets/quiz/js/mustache.min.js"></script>
+<script src="libraries/widgets/quiz/js/quiz-app.js"></script>
+<script src="libraries/widgets/interactive/js/ace/js/ace.js"></script>
+<script src="libraries/widgets/interactive/js/interactive.js"></script>
+
+  <script>  
+  $(function (){ 
+    $("#example").popover(); 
+    $("[rel='tooltip']").tooltip(); 
+  });  
+  </script>  
+  
+  <script src="shared/shiny.js" type="text/javascript"></script>
+  <script src="shared/slider/js/jquery.slider.min.js"></script>
+  <script src="shared/bootstrap/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="shared/slider/css/jquery.slider.min.css"></link>
   
   <!-- LOAD HIGHLIGHTER JS FILES -->
   <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
